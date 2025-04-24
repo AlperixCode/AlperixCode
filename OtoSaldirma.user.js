@@ -3,7 +3,7 @@
 // @namespace    FunnyPocketBook
 // @version      4.0
 // @description  No Needed
-// @author       Alper
+// @author       Alper Discord : alper8408
 // @include      **screen=place&try=confirm*
 // @grant        none
 // ==/UserScript==
