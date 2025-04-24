@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name                Premium For Scav
+// @name                Premium For Scav12
 // @author              Alperix Discord : alper8408
 // @include             *://*/*game.php*village=*&screen=main*
 // @icon                https://dsus.innogamescdn.com/asset/9639a99d/graphic/unit/unit_spear.png
