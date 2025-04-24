@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Set Arrival Time By Alperix (2025 Fixed)
+// @name         Alperix - Arrival
 // @namespace    FunnyPocketBook
 // @version      4.0
 // @description  Sends the attack/support at perfect time using arrival or server clock, includes ms offset (2025 compatible)
