@@ -2,7 +2,7 @@
 // @name         Alperix - Arrival
 // @namespace    FunnyPocketBook
 // @version      4.0
-// @description  Sends the attack/support at perfect time using arrival or server clock, includes ms offset (2025 compatible)
+// @description  No Needed
 // @author       Alper
 // @include      **screen=place&try=confirm*
 // @grant        none
