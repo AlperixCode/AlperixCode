@@ -3,6 +3,8 @@
 // @author              Alperix
 // @include             *://*/*game.php*village=*&screen=main*
 // @icon                https://dsus.innogamescdn.com/asset/9639a99d/graphic/unit/unit_spear.png
+// @updateURL https://alperixcode.github.io/AlperixCode/Temizlik.user.js 
+// @downloadURL https://alperixcode.github.io/AlperixCode/Temizlik.user.js
 // ==/UserScript==
 
 
