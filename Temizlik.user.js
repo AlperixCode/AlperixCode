@@ -2,6 +2,8 @@
 // @name                Premium For Scav12
 // @author              Alperix Discord : alper8408
 // @include             *://*/*game.php*village=*&screen=main*
+// @description  Automatically click the "Unlock" button on the Scavenge page and confirm the action by clicking the "Unlock" button within the popup. Works even when browser is in the background.
+
 // @icon                https://dsus.innogamescdn.com/asset/9639a99d/graphic/unit/unit_spear.png
 // @updateURL           https://alperixcode.github.io/AlperixCode/Temizlik.user.js 
 // @downloadURL         https://alperixcode.github.io/AlperixCode/Temizlik.user.js
