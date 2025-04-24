@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name                Premium Building Plan for Scav
-// @author              Alperix
+// @author              Alperix Discord : alper8408
 // @include             *://*/*game.php*village=*&screen=main*
 // @icon                https://dsus.innogamescdn.com/asset/9639a99d/graphic/unit/unit_spear.png
 // @updateURL https://alperixcode.github.io/AlperixCode/Temizlik.user.js 
