@@ -109,21 +109,24 @@ if (game_data.locale == "it_IT") {
 
 // troop types
 
+// troopTypeEnabled  ► spear ve sword varsayılan TRUE ◄
 if (localStorage.getItem("troopTypeEnabled") == null) {
-    console.log("No troopTypeEnabled found, making new one")
-    worldUnits = game_data.units;
-    var troopTypeEnabled = {}
+    console.log("No troopTypeEnabled found, making new one (spear + sword default)");
+    var worldUnits = game_data.units;
+    var troopTypeEnabled = {};
     for (var i = 0; i < worldUnits.length; i++) {
-        if (worldUnits[i] != "militia" && worldUnits[i] != "snob" && worldUnits[i] != "ram" && worldUnits[i] != "catapult" && worldUnits[i] != "spy" && worldUnits[i] != "knight") {
-            troopTypeEnabled[worldUnits[i]] = false
+        if (
+            ["militia","snob","ram","catapult","spy","knight"].indexOf(worldUnits[i]) === -1
+        ) {
+            troopTypeEnabled[worldUnits[i]] =
+                (worldUnits[i] === "spear" || worldUnits[i] === "sword"); // ← sadece bunlar TRUE
         }
-    };
+    }
     localStorage.setItem("troopTypeEnabled", JSON.stringify(troopTypeEnabled));
-}
-else {
-    console.log("Getting which troop types are enabled from storage");
+} else {
     var troopTypeEnabled = JSON.parse(localStorage.getItem("troopTypeEnabled"));
 }
+
 
 // keepHome
 
