@@ -1,0 +1,3 @@
+CLICK #attack_button_a
+WAIT 2000
+CLICK #confirm
