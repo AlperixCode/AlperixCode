@@ -1,13 +1,3 @@
-// ==UserScript==
-// @name         5‑Ödül Toplama (Stabil-Hızlı)
-// @author       Alperix
-// @namespace    https://github.com/Alperix
-// @version      1.2.0
-// @include      **screen=main*
-// @icon         https://dsus.innogamescdn.com/asset/9639a99d/graphic/items/resources_percent_10.png
-// @grant        none
-// ==/UserScript==
-
 (function () {
   'use strict';
 
