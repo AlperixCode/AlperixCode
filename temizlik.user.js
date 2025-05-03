@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-
+ 
   /***** Ayarlar *****/
   const BASE_DELAY = 800;              // ms – biraz düşürüldü
   const RAND_FACTOR = 0.3;              // daha düşük varyasyon
