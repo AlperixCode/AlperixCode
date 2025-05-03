@@ -1,3 +1,5 @@
+console.log("🚀 Yeni server scripti yüklendi!");
+
 (function () {
     'use strict';
 
