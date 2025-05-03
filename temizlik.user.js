@@ -1,103 +1,167 @@
 (function () {
-  'use strict';
- 
-  /***** Ayarlar *****/
-  const BASE_DELAY = 800;              // ms – biraz düşürüldü
-  const RAND_FACTOR = 0.3;              // daha düşük varyasyon
-  const QUEST_CLICK_MIN = 5_000;        // 5‑8 sn arası “yeni görev” tıklaması
-  const QUEST_CLICK_RANGE = 3_000;
+    'use strict';
 
-  /***** Yardımcı Fonksiyonlar *****/
-  const sleep = ms => new Promise(res => setTimeout(res, ms));
-  const randDelay = (base = BASE_DELAY) =>
-    base + Math.random() * base * RAND_FACTOR;
-
-  async function waitFor(selector, timeout = 8_000) { // timeout biraz düşürüldü
-    const start = Date.now();
-    while (Date.now() - start < timeout) {
-      const el = document.querySelector(selector);
-      if (el) return el;
-      await sleep(150);                // daha sık kontrol
+    // ========== CONFIG & STATE ==========
+    let inputMs = 0;
+    let input = "";
+    let delay = 0;
+    let delayTime = parseInt(localStorage.delayTime);
+    if (isNaN(delayTime)) {
+        delayTime = 250;
+        localStorage.delayTime = JSON.stringify(delayTime);
     }
-    return null;
-  }
 
-  /***** Ana Akış *****/
-  let collecting = false;
+    let arrInterval, attInterval;
 
-  async function collectRoutine() {
-    if (collecting) return;
-    const popup = document.querySelector('#popup_box_quest.show');
-    if (!popup) return;
-    collecting = true;
-    console.log('[ÖDÜL] Hızlı rutine başlıyorum');
+    // ========== HTML ADDITIONS ==========
+    const offsetHtml = `
+        <tr>
+            <td>
+                Offset
+                <span class="tooltip">
+                    <img src="https://dsen.innogamescdn.com/asset/2661920a/graphic/questionmark.png" style="max-width:13px"/>
+                    <span class="tooltiptext">
+                        Adjust milliseconds. If arrival is late by 50ms, set "-50".<br>Play with this for precise timing.
+                    </span>
+                </span>
+            </td>
+            <td>
+                <input id="delayInput" value="${delayTime}" style="width:50px">
+                <a id="delayButton" class="btn">OK</a>
+            </td>
+        </tr>`;
 
-    /* 1) Görevleri bitir */
-    const quests = [...document.querySelectorAll('.quest-complete-btn')];
-    for (const btn of quests) {
-      btn.click();
-      await sleep(randDelay() / 2);     // daha kısa bekleme
+    const setArrivalHtml = `
+        <tr><td>Set arrival:</td><td id="showArrTime"></td></tr>`;
+
+    const sendAttackHtml = `
+        <tr><td>Send at:</td><td id="showSendTime"></td></tr>`;
+
+    const buttons = `
+        <a id="arrTime" class="btn" style="cursor:pointer;">🎯 Set Arrival Time</a>
+        <a id="sendTime" class="btn" style="cursor:pointer;">🕒 Set Send Time</a>`;
+
+    // ========== INSERT TO PAGE ==========
+    const parentTable = document.getElementById("date_arrival").closest("table");
+    parentTable.insertAdjacentHTML("beforeend", offsetHtml + setArrivalHtml + sendAttackHtml);
+
+    const submitButton = document.querySelector("#troop_confirm_submit");
+    submitButton.insertAdjacentHTML("afterend", buttons);
+
+    // ========== ARRIVAL MODE ==========
+    function setArrivalTime() {
+        arrInterval = setInterval(() => {
+            const arrivalTime = document.querySelector(".relative_time")?.textContent;
+            if (!arrivalTime) return;
+
+            const currentArr = arrivalTime.slice(-8);
+            if (currentArr >= input) {
+                setTimeout(triggerClick, delay);
+                clearInterval(arrInterval);
+                console.log("⏱️ Sent at correct arrival match:", currentArr);
+            }
+        }, 5);
     }
-    console.log(`[ÖDÜL] ${quests.length} görev tamamlandı`);
 
-    /* 2) Ödül sekmesine geç */
-    await sleep(randDelay() / 2);
-    const rewardTab = await waitFor("a.tab-link[data-tab='reward-tab']");
-    if (rewardTab) rewardTab.click();
+    // ========== SERVER CLOCK MODE ==========
+    function setSendTime() {
+        attInterval = setInterval(() => {
+            const serverTime = document.querySelector("#serverTime")?.textContent;
+            if (!serverTime) return;
 
-    /* 3) 'Claim All' butonlarını tıkla */
-    await sleep(randDelay() / 2);
-    const claimAllBtns = [
-      ...document.querySelectorAll('.reward-system-claim-all-button'),
-    ];
-    for (const btn of claimAllBtns) {
-      btn.click();
-      await sleep(randDelay() / 2);
+            if (serverTime >= input) {
+                setTimeout(triggerClick, delay);
+                clearInterval(attInterval);
+                console.log("⏱️ Sent at correct server time:", serverTime);
+            }
+        }, 5);
     }
-    console.log(`[ÖDÜL] ${claimAllBtns.length}× Claim All tıklandı`);
 
-    /* 4) Tek tek ödül butonları */
-    await sleep(randDelay() / 2);
-    const singleBtns = [
-      ...document.querySelectorAll('.reward-system-claim-button'),
-    ];
-    for (const btn of singleBtns) {
-      btn.click();
-      await sleep(randDelay() / 2);
+    // ========== CLICK TRIGGER (multi-method) ==========
+    function triggerClick() {
+        const btn = document.querySelector("#troop_confirm_submit");
+        if (!btn) return alert("⚠️ Send button not found!");
+
+        btn.disabled = false;
+
+        try {
+            btn.click();
+            console.log("✅ .click() used");
+        } catch (e) {
+            console.warn("❌ .click() failed", e);
+        }
+
+        try {
+            const evt = new MouseEvent("click", { bubbles: true, cancelable: true, view: window });
+            btn.dispatchEvent(evt);
+            console.log("✅ MouseEvent dispatched");
+        } catch (e) {
+            console.warn("❌ MouseEvent dispatch failed", e);
+        }
+
+        try {
+            const form = btn.closest("form");
+            if (form) {
+                form.submit();
+                console.log("✅ form.submit() used");
+            }
+        } catch (e) {
+            console.warn("❌ form.submit() failed", e);
+        }
     }
-    console.log(`[ÖDÜL] ${singleBtns.length} tekil ödül alındı`);
 
-    /* 5) Temizlik */
-    await sleep(randDelay() / 2);
-    const close = document.querySelector('.tooltip-delayed');
-    if (close) close.click();
+    // ========== BUTTON EVENTS ==========
+    document.getElementById("arrTime").onclick = () => {
+        clearInterval(attInterval);
 
-    collecting = false;
-    console.log('[ÖDÜL] Hızlı döngü bitti');
-  }
+        const current = document.querySelector(".relative_time")?.textContent.slice(-8);
+        input = prompt("⏰ Enter desired ARRIVAL time (HH:MM:SS):", current);
+        inputMs = parseInt(prompt("➕ Enter ms offset (e.g. 000):", "000")) || 0;
 
-  /***** Belirli aralıkla yeni görev butonuna tıkla *****/
-  async function clickQuestLoop() {
-    while (true) {
-      await sleep(
-        QUEST_CLICK_MIN + Math.random() * QUEST_CLICK_RANGE,
-      );
-      const btn = document.getElementById('new_quest');
-      if (btn) btn.click();
-    }
-  }
+        delay = delayTime + inputMs;
+        document.getElementById("showArrTime").textContent = `${input}:${String(inputMs).padStart(3, "0")}`;
+        document.getElementById("showSendTime").textContent = "";
+        setArrivalTime();
+    };
 
-  /***** Interval yerine “yumuşak” döngü *****/
-  (async function main() {
-    clickQuestLoop();
-    while (true) {
-      await sleep(randDelay() / 2);      // çok daha hızlı
-      try {
-        await collectRoutine();
-      } catch (e) {
-        console.error('[ÖDÜL] Hata:', e);
-        collecting = false;
-      }
-    }
-  })();
+    document.getElementById("sendTime").onclick = () => {
+        clearInterval(arrInterval);
+
+        const current = document.getElementById("serverTime").textContent;
+        input = prompt("⏰ Enter desired SEND time (HH:MM:SS):", current);
+        inputMs = parseInt(prompt("➕ Enter ms offset (e.g. 000):", "000")) || 0;
+
+        delay = delayTime + inputMs;
+        document.getElementById("showSendTime").textContent = `${input}:${String(inputMs).padStart(3, "0")}`;
+        document.getElementById("showArrTime").textContent = "";
+        setSendTime();
+    };
+
+    document.getElementById("delayButton").onclick = () => {
+        delayTime = parseInt(document.getElementById("delayInput").value);
+        localStorage.delayTime = JSON.stringify(delayTime);
+        delay = delayTime + inputMs;
+        if (delay < 0) delay = 0;
+    };
+
+    // ========== STYLES ==========
+    const style = document.createElement("style");
+    style.textContent = `
+        .tooltip { position: relative; display: inline-block; }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background: linear-gradient(to bottom, #e3c485 0%, #ecd09a 100%);
+            color: black;
+            text-align: center;
+            padding: 5px;
+            border-radius: 6px;
+            border: 1px solid #804000;
+            position: absolute;
+            z-index: 1;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }`;
+    document.head.appendChild(style);
 })();
